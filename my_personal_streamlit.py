@@ -78,7 +78,7 @@ fig = px.choropleth(
         color_continuous_scale='Viridis',
         range_color=(0, df['Value'].max()),
         labels={'Value': 'Value'},
-        title='Immigrants to Italy between 1995 and 2013 from ' + region
+        title='Foreign Emigrants from Italy between 1995 and 2013 from ' + region
     )
 
 fig.update_layout(
@@ -93,9 +93,9 @@ def get_year_input():
     year = st.sidebar.slider('Select a year', min_value=1995, max_value=2013)
     return year
 
-
-st.title('Top 10 Countries by Emigrants from Italy')
 year = get_year_input()
+st.title('Top 10 Destination Countries of Italian Foreign Emigrants in '+ str(year))
+
 
 fig_1 = plt.figure(figsize=(12, 8))
 sb.set(style="white")
@@ -108,4 +108,64 @@ sb.barplot(x=df_sorted_year[year].head(10), y=df_sorted_year['Country'].head(10)
 st.pyplot(fig_1)
 
 
+top_10_year_input = df_sorted_year.head(10)
 
+country_list = list(top_10_year_input['Country'])
+total_list = list(top_10_year_input[year])
+
+# other map of the top 10
+
+data_2 = {
+    'Country': country_list,
+    'Value': total_list
+}
+
+df_2 = pd.DataFrame(data_2)
+
+fig_2 = px.choropleth(
+    df_2,
+    locations='Country',
+    locationmode='country names',
+    color='Value',
+    color_continuous_scale='Viridis',
+    range_color=(0, df_2['Value'].max()),
+    labels={'Value': 'Value'},
+    title='Top 10 destionation Countries of Italian Foreign Emigrants in '+ str(year),
+    scope='world'
+)
+fig_2.update_layout(
+    geo=dict(showframe=False, showcoastlines=False),
+    margin={"r": 0, "t": 30, "l": 0, "b": 0}
+)
+
+st.plotly_chart(fig_2)
+
+country_list_global = list(df_sorted_emi['Country'])
+total_list_global = list(df_sorted_emi['Total'])
+
+# plot the global countries per immigration
+data_3 = {
+    'Country': country_list_global,
+    'Value': total_list_global
+}
+
+df_3= pd.DataFrame(data_3)
+
+fig_3 = px.choropleth(
+    df_3,
+    locations='Country',
+    locationmode='country names',
+    color='Value',
+    color_continuous_scale='Viridis',
+    range_color=(0, df_3['Value'].max()),
+    labels={'Value': 'Value'},
+    title='World destination of Italian Foreign Emigrants'
+)
+
+
+fig_3.update_layout(
+    geo=dict(showframe=False, showcoastlines=False),
+    margin={"r": 0, "t": 30, "l": 0, "b": 0}
+)
+
+st.plotly_chart(fig_3)
