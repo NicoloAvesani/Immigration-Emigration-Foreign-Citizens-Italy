@@ -1,0 +1,14 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sb
+import streamlit as st
+
+
+
+italy_emi_data = pd.read_excel('Italy.xlsx')
+
+df_initial = italy_emi_data
+
+
+print(df_initial.head())
