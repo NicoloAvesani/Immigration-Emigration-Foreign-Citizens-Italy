@@ -147,20 +147,15 @@ import plotly.graph_objects as go
 
 df_sorted_year = df_sorted_emi.sort_values(by=year, ascending=False).head(10)
 
-fig_1 = go.Figure(data=go.Bar(
-    y=df_sorted_year[year],
-    x=df_sorted_year['Country'],
-    marker_color='blue',
-    marker_line_color='black',
-    marker_line_width=0.5,
-    opacity=0.8
-))
+fig_1 = px.bar(df_sorted_year, x='Country', y=year,
+               hover_data=['Country', year], color=year,
+               labels={year: year, 'Country': 'Countries'},
+               template='plotly_white')
 
 fig_1.update_layout(
-    title='Top 10 Birth-Countries of Italian Foreign Immigrants',
-    yaxis_title='Immigrants',
+    title='Top 10 Birth_countries of Italian Foreign Immigrants',
     xaxis_title='Countries',
-    template='plotly_white'
+    yaxis_title='Immigrants',
 )
 
 st.plotly_chart(fig_1)

@@ -52,6 +52,35 @@ for i in df_sorted_emi.index:
 
 st.dataframe(df_sorted_emi)
 
+country_list_global = list(df_sorted_emi['Country'])
+total_list_global = list(df_sorted_emi['Total'])
+
+# plot the global countries per immigration
+data_3 = {
+    'Country': country_list_global,
+    'Value': total_list_global
+}
+
+df_3= pd.DataFrame(data_3)
+
+st.title('World destination of Italian Foreign Emigrants')
+fig_3 = px.choropleth(
+    df_3,
+    locations='Country',
+    locationmode='country names',
+    color='Value',
+    color_continuous_scale='Viridis',
+    range_color=(0, df_3['Value'].max()),
+    labels={'Value': 'Value'}
+)
+
+
+fig_3.update_layout(
+    geo=dict(showframe=False, showcoastlines=False),
+    margin={"r": 0, "t": 30, "l": 0, "b": 0}
+)
+
+st.plotly_chart(fig_3)
 
 def get_region_input():
     region_options = ['Asia', 'Europe', 'North America', 'South America', 'Africa']
@@ -103,15 +132,22 @@ year = get_year_input()
 st.title('Top 10 Destination Countries of Italian Foreign Emigrants in '+ str(year))
 
 
-fig_1 = plt.figure(figsize=(12, 8))
-sb.set(style="white")
+import plotly.graph_objects as go
 
-df_sorted_year = df_sorted_emi.sort_values(by=year, ascending=False)
+df_sorted_year = df_sorted_emi.sort_values(by=year, ascending=False).head(10)
 
-sb.barplot(x=df_sorted_year[year].head(10), y=df_sorted_year['Country'].head(10),
-               palette="Blues_r", edgecolor=".2")
+fig_1 = px.bar(df_sorted_year, x='Country', y=year,
+               hover_data=['Country', year], color=year,
+               labels={year: year, 'Country': 'Countries'},
+               template='plotly_white')
 
-st.pyplot(fig_1)
+fig_1.update_layout(
+    title='Top 10 Destination Countries of Italian Foreign Emigrants',
+    xaxis_title='Countries',
+    yaxis_title='Emigrants',
+)
+
+st.plotly_chart(fig_1)
 
 
 top_10_year_input = df_sorted_year.head(10)
@@ -147,35 +183,6 @@ fig_2.update_layout(
 
 st.plotly_chart(fig_2)
 
-country_list_global = list(df_sorted_emi['Country'])
-total_list_global = list(df_sorted_emi['Total'])
-
-# plot the global countries per immigration
-data_3 = {
-    'Country': country_list_global,
-    'Value': total_list_global
-}
-
-df_3= pd.DataFrame(data_3)
-
-st.title('World destination of Italian Foreign Emigrants')
-fig_3 = px.choropleth(
-    df_3,
-    locations='Country',
-    locationmode='country names',
-    color='Value',
-    color_continuous_scale='Viridis',
-    range_color=(0, df_3['Value'].max()),
-    labels={'Value': 'Value'}
-)
-
-
-fig_3.update_layout(
-    geo=dict(showframe=False, showcoastlines=False),
-    margin={"r": 0, "t": 30, "l": 0, "b": 0}
-)
-
-st.plotly_chart(fig_3)
 
 #pie chart 
 
@@ -382,30 +389,34 @@ y_pred_train = poly(x)
 r2 = r2_score(y, y_pred_train)
 st.write("R-squared Score:", r2)
 
-# last model, use the stats model ARIMA
 
-df_prediction_arima = tot.copy()
+st.title('Using ARIMA to Predict the Total Future Emigrants in next 3 years')
+# last model, use the stats model ARIMA
+import statsmodels.api as sm
+
+df_prediction = tot.copy()
 # Prepare the data for time series forecasting
-df_prediction_arima['year'] = pd.to_datetime(df_prediction_arima['year'], format='%Y')
-df_prediction_arima.set_index('year', inplace=True)
+df_prediction['year'] = pd.to_datetime(df_prediction['year'], format='%Y')
+df_prediction.set_index('year', inplace=True)
 
 # Create and fit the ARIMA model
-model = sm.tsa.ARIMA(df_prediction_arima['total'], order=(1, 1, 1))
+model = sm.tsa.ARIMA(df_prediction['total'], order=(1, 1, 1))
 model_fit = model.fit()
 
 # Predict immigration for the next three years
 next_years = pd.date_range(start='2014', periods=3, freq='A')
-predicted_immigration_arima = model_fit.predict(start=df_prediction_arima.shape[0], end=df_prediction_arima.shape[0]+2)
+predicted_immigration = model_fit.predict(start=df_prediction.shape[0], end=df_prediction.shape[0]+2)
 
+# Plotting the historical data
+fig_11 = plt.figure(figsize=(6,6))
 years = tot['year'].values
 immigration = tot['total'].values
 
 plt.plot(years, immigration, marker='o', linestyle='-', label='Historical Data')
 
-fig_11 = plt.figure(figsize=(6,6))
 # Plotting the predicted values
 next_years = np.arange(2014, 2017)
-predicted_immigration = predicted_immigration_arima
+predicted_immigration = predicted_immigration
 
 plt.plot(next_years, predicted_immigration, marker='o', linestyle='-', label='Predicted Data')
 
@@ -417,6 +428,3 @@ plt.legend()
 
 # Display the plot
 st.pyplot(fig_11)
-
-for year, immigration in zip(next_years, predicted_immigration):
-    st.write(f"Year: {year.year}, Predicted Emigration: {immigration}")
