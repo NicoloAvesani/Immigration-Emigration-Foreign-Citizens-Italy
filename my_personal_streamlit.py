@@ -4,7 +4,9 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sb
 import numpy as np
-
+import statsmodels as sm
+import sklearn
+from sklearn.metrics import r2_score
 
 st.title('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
 
@@ -288,7 +290,7 @@ ax.legend()
 
 st.pyplot(fig_5)
 
-# regression
+# linear regression
 x = tot['year']
 y = tot['total']
 fit = np.polyfit(x, y, deg=1)
@@ -306,7 +308,7 @@ plt.plot(x, fit[0] * x + fit[1], color='red')
 st.pyplot(fig_6)
 
 
-st.title('Polynomial Regression, Predicting the Emigrants')
+st.title('Linear Regression for Predicting the Emigrants')
 # polynomial regression
 fit = np.polyfit(x, y, deg=1)
 
@@ -328,12 +330,16 @@ plt.scatter(x_pred, y_pred, color='green', label='Predicted Data')
 
 plt.title('Prediction of Number of Emigrants')
 plt.xlabel('Year')
-plt.ylabel('Total Immigrants')
+plt.ylabel('Total Emigrants')
 plt.legend()
 
 st.pyplot(fig_7)
+r2 = r2_score(y, fit[0] * x + fit[1])
+st.write("R-squared Score:", r2)
 
 
+st.title('Linear and Polynomial Regression for Predicting the Emigrants')
+#polynomial
 def get_degree_input():
     degree_options = [1,2,3,4,5,6,7,8,9,10]
     degree = st.sidebar.selectbox('Select a degree', degree_options)
@@ -353,7 +359,7 @@ x_pred = np.arange(min(x), max(x) + 5)  # Extend by 5 years
 # Predict the corresponding y values using the polynomial regression
 y_pred = poly(x_pred)
 
-fig_8 = plt.figure(figsize=(6, 6))
+fig_8 = plt.figure(figsize=(6,6))
 # Plot the original data points
 plt.scatter(x, y, color='blue', label='Original Data')
 
@@ -367,10 +373,50 @@ plt.title('Prediction of Number of Emigrants')
 plt.xlabel('Year')
 plt.ylabel('Total Emigrants')
 plt.legend()
-
-
-# Calculate R-squared score for the polynomial regression
-y_pred_train = poly(x)
+plt.show()
 
 st.pyplot(fig_8)
 
+#r2
+y_pred_train = poly(x)
+r2 = r2_score(y, y_pred_train)
+st.write("R-squared Score:", r2)
+
+# last model, use the stats model ARIMA
+
+df_prediction_arima = tot.copy()
+# Prepare the data for time series forecasting
+df_prediction_arima['year'] = pd.to_datetime(df_prediction_arima['year'], format='%Y')
+df_prediction_arima.set_index('year', inplace=True)
+
+# Create and fit the ARIMA model
+model = sm.tsa.ARIMA(df_prediction_arima['total'], order=(1, 1, 1))
+model_fit = model.fit()
+
+# Predict immigration for the next three years
+next_years = pd.date_range(start='2014', periods=3, freq='A')
+predicted_immigration_arima = model_fit.predict(start=df_prediction_arima.shape[0], end=df_prediction_arima.shape[0]+2)
+
+years = tot['year'].values
+immigration = tot['total'].values
+
+plt.plot(years, immigration, marker='o', linestyle='-', label='Historical Data')
+
+fig_11 = plt.figure(figsize=(6,6))
+# Plotting the predicted values
+next_years = np.arange(2014, 2017)
+predicted_immigration = predicted_immigration_arima
+
+plt.plot(next_years, predicted_immigration, marker='o', linestyle='-', label='Predicted Data')
+
+# Adding labels and title to the plot
+plt.xlabel('Year')
+plt.ylabel('Emigration')
+plt.title('Historical and Predicted Emigration')
+plt.legend()
+
+# Display the plot
+st.pyplot(fig_11)
+
+for year, immigration in zip(next_years, predicted_immigration):
+    st.write(f"Year: {year.year}, Predicted Emigration: {immigration}")
