@@ -5,11 +5,12 @@ import matplotlib.pyplot as plt
 import seaborn as sb
 import numpy as np
 
+
 st.title('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
 
 st.header('DATASET')
 
-italy_emi_data = pd.read_excel('/Users/ave/Desktop/social_research-1/Italy.xlsx')
+italy_emi_data = pd.read_excel('/Users/ave/Desktop/social_research/Italy.xlsx')
 italy_emi_data.replace(['..'],0, inplace = True)
 
 # emigrants
@@ -176,7 +177,7 @@ st.plotly_chart(fig_3)
 st.title("Italian Foreign Emigrants per Year")
 
 # Specify the video file path
-video_path = '/Users/ave/Desktop/social_research-1/Number of Foreigner Emigrants from Italy per Year.mp4'
+video_path = '/Users/ave/Desktop/social_research/Number of Foreigner Emigrants from Italy per Year.mp4'
 
 # Display the video
 st.video(video_path)
@@ -184,18 +185,10 @@ st.video(video_path)
 st.title("Total Italian Foreign Emigrants 1995-2013")
 
 # Specify the video file path
-video_path = '/Users/ave/Desktop/social_research-1/total_emigrandt_italy_with_sum-2.mp4'
+video_path = '/Users/ave/Desktop/social_research/total_emigrandt_italy_with_sum-2.mp4'
 
 # Display the video
 st.video(video_path)
-
-
-# create the continent df
-continents = italy_emi_data.groupby('AreaName', axis=0).sum()
-print(type(italy_emi_data.groupby('AreaName', axis=0)))
-continents_t = continents.T.drop(columns=['World'])
-continents = continents_t.T
-
 
 # models
 years_int = list(range(1996, 2001)) + list(range(2002, 2014))
@@ -274,32 +267,70 @@ plt.legend()
 st.pyplot(fig_7)
 
 
+def get_degree_input():
+    degree_options = [1,2,3,4,5,6,7,8,9,10]
+    degree = st.sidebar.selectbox('Select a degree', degree_options)
+    return degree
 
+degree = get_degree_input()
 
 # fig_8--> linear regression prediction and r2
-fit_1 = np.polyfit(x, y, deg=1)
+# Perform polynomial regression
+degree = degree  # Adjust the degree of the polynomial as needed
+coefficients = np.polyfit(x, y, deg=degree)
+poly = np.poly1d(coefficients)
 
-# Generate x values for prediction (next years)
-x_pred = np.arange(max(x)+1, max(x) + 6)  # Predicting for next 5 years (adjust as needed)
+# Generate x values for prediction (including future years)
+x_pred = np.arange(min(x), max(x) + 5)  # Extend by 5 years
 
-# Predict the corresponding y values using the fitted line
-y_pred = fit_1[0] * x_pred + fit_1[1]
+# Predict the corresponding y values using the polynomial regression
+y_pred = poly(x_pred)
 
 fig_8 = plt.figure(figsize=(6, 6))
 # Plot the original data points
 plt.scatter(x, y, color='blue', label='Original Data')
 
 # Plot the fitted line
-plt.plot(x, fit_1[0] * x + fit_1[1], color='red', label='Fitted Line')
+plt.plot(x_pred, y_pred, color='red', label='Fitted Line')
 
-# Plot the predicted values for next years
-plt.scatter(x_pred, y_pred, color='green', label='Predicted Data')
+# Plot the predicted values for future years
+plt.scatter(x_pred[-11:], y_pred[-11:], color='green', label='Predicted Data')
 
-plt.title('Prediction of Number of Immigrants')
+plt.title('Prediction of Number of Emigrants')
 plt.xlabel('Year')
-plt.ylabel('Total Immigrants')
+plt.ylabel('Total Emigrants')
 plt.legend()
+
+
+# Calculate R-squared score for the polynomial regression
+y_pred_train = poly(x)
+
 st.pyplot(fig_8)
 
-r2 = r2_score(y, fit[0] * x + fit[1])
-st.text("R-squared Score:", r2)
+#pie chart 
+continents = italy_emi_data.groupby('AreaName', axis=0).sum()
+print(type(italy_emi_data.groupby('AreaName', axis=0)))
+continents_t = continents.T.drop(columns=['World'])
+continents = continents_t.T
+
+# Create a new DataFrame for the pie chart
+pie_df = continents[['Total']].copy()
+pie_df.reset_index(inplace=True)
+
+# Set up the colors and explode list
+colors_list = ['green', 'red', 'yellow', 'blue', 'orange', 'black']
+explode_list = [0.1, 0.1, 0, 0.1, 0.1, 0]
+
+# Create the interactive pie chart using Plotly
+fig_9 = px.pie(pie_df, values='Total', names='AreaName', color_discrete_sequence=colors_list,
+             title='Emigration to Italy by Continent [1995 - 2013]',
+             hover_data={'Total': ':.1f%'})
+
+# Add percentage labels
+fig_9.update_traces(textposition='inside', textinfo='percent+label')
+
+# Update the layout
+fig_9.update_traces(hoverinfo='label', marker=dict(line=dict(color='#000000', width=2)))
+
+
+st.plotly_chart(fig_9)
