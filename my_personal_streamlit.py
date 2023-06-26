@@ -8,6 +8,7 @@ import numpy as np
 
 st.title('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
 
+
 st.header('DATASET')
 
 italy_emi_data = pd.read_excel('/Users/ave/Desktop/social_research/Italy.xlsx')
@@ -52,7 +53,7 @@ st.dataframe(df_sorted_emi)
 
 def get_region_input():
     region_options = ['Asia', 'Europe', 'North America', 'South America', 'Africa']
-    region = st.sidebar.selectbox('Select a region', region_options)
+    region = st.sidebar.selectbox('Select a region for the Map', region_options)
     return region
 
 region = get_region_input()
@@ -174,6 +175,72 @@ fig_3.update_layout(
 
 st.plotly_chart(fig_3)
 
+#pie chart 
+
+st.title('Italian Foreign Emigrates by Continent 1995-2013')
+continents = italy_emi_data.groupby('AreaName', axis=0).sum()
+print(type(italy_emi_data.groupby('AreaName', axis=0)))
+continents_t = continents.T.drop(columns=['World'])
+continents = continents_t.T
+
+# Create a new DataFrame for the pie chart
+pie_df = continents[['Total']].copy()
+pie_df.reset_index(inplace=True)
+
+# Set up the colors and explode list
+colors_list = ['green', 'red', 'yellow', 'blue', 'orange', 'black']
+explode_list = [0.1, 0.1, 0, 0.1, 0.1, 0]
+
+# Create the interactive pie chart using Plotly
+fig_9 = px.pie(pie_df, values='Total', names='AreaName', color_discrete_sequence=colors_list,
+             title='Emigration to Italy by Continent [1995 - 2013]',
+             hover_data={'Total': ':.1f%'})
+
+# Add percentage labels
+fig_9.update_traces(textposition='inside', textinfo='percent+label')
+
+# Update the layout
+fig_9.update_traces(hoverinfo='label', marker=dict(line=dict(color='#000000', width=2)))
+
+
+st.plotly_chart(fig_9)
+
+
+def get_region_2_input():
+    region_options_2 = ['Asia', 'Europe', 'Latin America and the Caribbean', 'Africa']
+    region_2 = st.sidebar.selectbox('Select a region for the Pie', region_options_2)
+    return region_2
+
+region_2 = get_region_2_input()
+
+st.title('Italian Foreign Emigrates by '+region_2+' 1995-2013')
+
+region_chosen = italy_emi_data['AreaName'] == str(region_2)
+region_chosen_df = italy_emi_data[region_chosen]
+
+region_chosen_top_5 = region_chosen_df.sort_values('Total').tail(5)
+
+pie_df_2 = region_chosen_top_5[['Country', 'Total']].copy()
+pie_df_2.reset_index(inplace=True, drop=True)
+
+# Set up the colors and explode list
+colors_list = ['green', 'red', 'yellow', 'blue', 'orange']
+explode_list = [0.1, 0.1, 0, 0.1, 0.1]
+
+# Create the interactive pie chart using Plotly
+fig_10 = px.pie(pie_df_2, values='Total', names='Country', color_discrete_sequence=colors_list,
+             title='Italian Foreign Emigrants going back to '+ region_2+' Countries [1995 - 2013]',
+             hover_data={'Total': ':.1f%'})
+
+# Add percentage labels
+fig_10.update_traces(textposition='inside', textinfo='percent+label')
+
+# Update the layout
+fig_10.update_traces(hoverinfo='label', marker=dict(line=dict(color='#000000', width=2)))
+
+st.plotly_chart(fig_10)
+
+
 st.title("Italian Foreign Emigrants per Year")
 
 # Specify the video file path
@@ -222,16 +289,16 @@ ax.legend()
 st.pyplot(fig_5)
 
 # regression
-
 x = tot['year']
 y = tot['total']
 fit = np.polyfit(x, y, deg=1)
 
-fig_6 = plt.figure(figsize=(6, 6))
+fig_6 = plt.figure(figsize=(10, 6))
 plt.scatter(tot['year'], tot['total'])
 plt.title('Total Emigration 1995-2013')
 plt.xlabel('Year')
 plt.ylabel('Number of Immigrants')
+
 
 # Assuming you have defined 'x' and 'fit' appropriately
 plt.plot(x, fit[0] * x + fit[1], color='red')
@@ -307,30 +374,3 @@ y_pred_train = poly(x)
 
 st.pyplot(fig_8)
 
-#pie chart 
-continents = italy_emi_data.groupby('AreaName', axis=0).sum()
-print(type(italy_emi_data.groupby('AreaName', axis=0)))
-continents_t = continents.T.drop(columns=['World'])
-continents = continents_t.T
-
-# Create a new DataFrame for the pie chart
-pie_df = continents[['Total']].copy()
-pie_df.reset_index(inplace=True)
-
-# Set up the colors and explode list
-colors_list = ['green', 'red', 'yellow', 'blue', 'orange', 'black']
-explode_list = [0.1, 0.1, 0, 0.1, 0.1, 0]
-
-# Create the interactive pie chart using Plotly
-fig_9 = px.pie(pie_df, values='Total', names='AreaName', color_discrete_sequence=colors_list,
-             title='Emigration to Italy by Continent [1995 - 2013]',
-             hover_data={'Total': ':.1f%'})
-
-# Add percentage labels
-fig_9.update_traces(textposition='inside', textinfo='percent+label')
-
-# Update the layout
-fig_9.update_traces(hoverinfo='label', marker=dict(line=dict(color='#000000', width=2)))
-
-
-st.plotly_chart(fig_9)
