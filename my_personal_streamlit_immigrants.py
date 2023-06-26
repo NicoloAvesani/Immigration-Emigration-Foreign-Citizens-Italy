@@ -5,11 +5,14 @@ import matplotlib.pyplot as plt
 import seaborn as sb
 import numpy as np
 
+st.title('Italian Foreign Emigrates 1995-2013')
+st.header('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
 
-st.title('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
 
+st.title('Emigration Dataset')
 
-st.header('DATASET')
+st.write('In this section, we can see the composition of the Cleaned Dataset for Italian Foreign Immigrants.')
+st.write(" ## The columns are:\n\n'**Type**': 'Immigrants', cause we are considering the Immigrants,\n\n'**Coverage**': tell me if the immigrants are from Italy or from Other countries,\n\n'**Country**': tells me the Birth-Country of the Immigrants, \n\n'**AreaName**': tells me World-Area of the Immigrants, \n\n'**RegName**': tells me the Region Name of origin of the Immigrants, \n\n'**DevName**': tells me if the 'Country' is a developed or developing one, \n\n**Years (1995-2013)**: Immigration from different Countries in the particular year, \n\n'**Total**': tells me the total number of Immigrants between 1995 and 2013 of the particular Country ")
 
 italy_imm_data = pd.read_excel('/Users/ave/Desktop/social_research/Italy.xlsx')
 italy_imm_data.replace(['..'],0, inplace = True)
@@ -91,6 +94,40 @@ fig.update_layout(
     )
 
 st.plotly_chart(fig)
+st.write('You can **change** the Region selecting the desired one in the Sidebox')
+
+#global
+country_list_global = list(df_sorted_emi['Country'])
+total_list_global = list(df_sorted_emi['Total'])
+
+# plot the global countries per immigration
+data_3 = {
+    'Country': country_list_global,
+    'Value': total_list_global
+}
+
+df_3= pd.DataFrame(data_3)
+
+# world
+st.title('World Birth-Countries of Italian Foreign Immigrants')
+fig_3 = px.choropleth(
+    df_3,
+    locations='Country',
+    locationmode='country names',
+    color='Value',
+    color_continuous_scale='Viridis',
+    range_color=(0, df_3['Value'].max()),
+    labels={'Value': 'Value'}
+)
+
+
+fig_3.update_layout(
+    geo=dict(showframe=False, showcoastlines=False),
+    margin={"r": 0, "t": 30, "l": 0, "b": 0}
+)
+
+st.plotly_chart(fig_3)
+
 
 # let's see the main country
 def get_year_input():
@@ -145,42 +182,12 @@ fig_2.update_layout(
 
 st.plotly_chart(fig_2)
 
-country_list_global = list(df_sorted_emi['Country'])
-total_list_global = list(df_sorted_emi['Total'])
-
-# plot the global countries per immigration
-data_3 = {
-    'Country': country_list_global,
-    'Value': total_list_global
-}
-
-df_3= pd.DataFrame(data_3)
-
-st.title('World Birth-Countries of Italian Foreign Immigrants')
-fig_3 = px.choropleth(
-    df_3,
-    locations='Country',
-    locationmode='country names',
-    color='Value',
-    color_continuous_scale='Viridis',
-    range_color=(0, df_3['Value'].max()),
-    labels={'Value': 'Value'}
-)
-
-
-fig_3.update_layout(
-    geo=dict(showframe=False, showcoastlines=False),
-    margin={"r": 0, "t": 30, "l": 0, "b": 0}
-)
-
-st.plotly_chart(fig_3)
-
 #pie chart 
 
 st.title('Italian Foreign Immigrants by Continent 1995-2013')
 continents = italy_imm_data.groupby('AreaName', axis=0).sum()
 print(type(italy_imm_data.groupby('AreaName', axis=0)))
-continents_t = continents.T.drop(columns=['World'])
+continents_t = continents.T
 continents = continents_t.T
 
 # Create a new DataFrame for the pie chart
@@ -244,7 +251,7 @@ st.plotly_chart(fig_10)
 st.title("Italian Foreign Immigrants per Year")
 
 # Specify the video file path
-video_path = '/Users/ave/Desktop/social_research/Number of Foreigner Immigrants from Italy per Year.mp4'
+video_path = '/Users/ave/Desktop/social_research/Number of Foreigner Emigrants from Italy per Year.mp4'
 
 # Display the video
 st.video(video_path)

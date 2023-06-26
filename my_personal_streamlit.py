@@ -9,7 +9,7 @@ import numpy as np
 st.title('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
 
 
-st.header('DATASET')
+st.title('Emigration Dataset')
 
 italy_emi_data = pd.read_excel('/Users/ave/Desktop/social_research/Italy.xlsx')
 italy_emi_data.replace(['..'],0, inplace = True)
