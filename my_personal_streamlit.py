@@ -74,6 +74,7 @@ fig_3 = px.choropleth(
     labels={'Value': 'Value'}
 )
 
+fig_3.update_geos(showcountries = True)
 
 fig_3.update_layout(
     geo=dict(showframe=False, showcoastlines=False),
@@ -115,6 +116,8 @@ fig = px.choropleth(
         labels={'Value': 'Value'},
         title='Foreign Emigrants from Italy between 1995 and 2013 from ' + region
     )
+
+fig.update_geos(showcountries = True)
 
 fig.update_layout(
         geo=dict(showframe=False, showcoastlines=False),
@@ -176,6 +179,9 @@ fig_2 = px.choropleth(
     labels={'Value': 'Value'},
     scope='world'
 )
+
+fig_2.update_geos(showcountries = True)
+
 fig_2.update_layout(
     geo=dict(showframe=False, showcoastlines=False),
     margin={"r": 0, "t": 30, "l": 0, "b": 0}
