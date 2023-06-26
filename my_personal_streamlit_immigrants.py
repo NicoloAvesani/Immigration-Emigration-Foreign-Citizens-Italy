@@ -4,6 +4,9 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sb
 import numpy as np
+import statsmodels.api as sm
+import sklearn
+from sklearn.metrics import mean_squared_error, r2_score
 
 st.title('Italian Foreign Emigrates 1995-2013')
 st.header('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
@@ -96,9 +99,10 @@ fig.update_layout(
 st.plotly_chart(fig)
 st.write('You can **change** the Region selecting the desired one in the Sidebox')
 
+try_df = df_sorted_emi.copy()
 #global
-country_list_global = list(df_sorted_emi['Country'])
-total_list_global = list(df_sorted_emi['Total'])
+country_list_global = list(try_df['Country'])
+total_list_global = list(try_df['Total'])
 
 # plot the global countries per immigration
 data_3 = {
@@ -114,6 +118,7 @@ fig_3 = px.choropleth(
     df_3,
     locations='Country',
     locationmode='country names',
+    scope="world",
     color='Value',
     color_continuous_scale='Viridis',
     range_color=(0, df_3['Value'].max()),
@@ -122,7 +127,7 @@ fig_3 = px.choropleth(
 
 
 fig_3.update_layout(
-    geo=dict(showframe=False, showcoastlines=False),
+    geo=dict(showframe=True, showcoastlines=False),
     margin={"r": 0, "t": 30, "l": 0, "b": 0}
 )
 
@@ -138,15 +143,28 @@ year = get_year_input()
 st.title('Top 10 Birth-Countries of Italian Foreign Immigrants in '+ str(year))
 
 
-fig_1 = plt.figure(figsize=(12, 8))
-sb.set(style="white")
+import plotly.graph_objects as go
 
-df_sorted_year = df_sorted_emi.sort_values(by=year, ascending=False)
+df_sorted_year = df_sorted_emi.sort_values(by=year, ascending=False).head(10)
 
-sb.barplot(x=df_sorted_year[year].head(10), y=df_sorted_year['Country'].head(10),
-               palette="Blues_r", edgecolor=".2")
+fig_1 = go.Figure(data=go.Bar(
+    y=df_sorted_year[year],
+    x=df_sorted_year['Country'],
+    marker_color='blue',
+    marker_line_color='black',
+    marker_line_width=0.5,
+    opacity=0.8
+))
 
-st.pyplot(fig_1)
+fig_1.update_layout(
+    title='Top 10 Birth-Countries of Italian Foreign Immigrants',
+    yaxis_title='Immigrants',
+    xaxis_title='Countries',
+    template='plotly_white'
+)
+
+st.plotly_chart(fig_1)
+
 
 
 top_10_year_input = df_sorted_year.head(10)
@@ -169,11 +187,11 @@ fig_2 = px.choropleth(
     df_2,
     locations='Country',
     locationmode='country names',
+    scope="world",
     color='Value',
     color_continuous_scale='Viridis',
     range_color=(0, df_2['Value'].max()),
-    labels={'Value': 'Value'},
-    scope='world'
+    labels={'Value': 'Value'}
 )
 fig_2.update_layout(
     geo=dict(showframe=False, showcoastlines=False),
@@ -200,7 +218,7 @@ explode_list = [0.1, 0.1, 0, 0.1, 0.1, 0]
 
 # Create the interactive pie chart using Plotly
 fig_9 = px.pie(pie_df, values='Total', names='AreaName', color_discrete_sequence=colors_list,
-             title='Emigration to Italy by Continent [1995 - 2013]',
+             title='Total Immigration in Italy by Continent [1995 - 2013]',
              hover_data={'Total': ':.1f%'})
 
 # Add percentage labels
@@ -251,7 +269,7 @@ st.plotly_chart(fig_10)
 st.title("Italian Foreign Immigrants per Year")
 
 # Specify the video file path
-video_path = '/Users/ave/Desktop/social_research/Number of Foreigner Emigrants from Italy per Year.mp4'
+video_path = '/Users/ave/Desktop/social_research/Number of Immigrants arriving in Italy per Year.mp4'
 
 # Display the video
 st.video(video_path)
@@ -259,7 +277,7 @@ st.video(video_path)
 st.title("Total Italian Foreign Immigrants 1995-2013")
 
 # Specify the video file path
-video_path = '/Users/ave/Desktop/social_research/total_emigrandt_italy_with_sum-2.mp4'
+video_path = '/Users/ave/Desktop/social_research/Total arrived in Italy sum.mp4'
 
 # Display the video
 st.video(video_path)
@@ -380,3 +398,5 @@ plt.legend()
 y_pred_train = poly(x)
 
 st.pyplot(fig_8)
+r2_2 = r2_score(y, fit[0] * x + fit[1])
+st.write("R-squared Score:", r2_2)
