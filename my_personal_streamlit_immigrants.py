@@ -8,7 +8,7 @@ import statsmodels as sm
 import sklearn
 from sklearn.metrics import mean_squared_error, r2_score
 
-st.title('Italian Foreign Immigrates 1995-2013')
+st.title('Italian Foreign Immigrants 1995-2013')
 st.header('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
 
 

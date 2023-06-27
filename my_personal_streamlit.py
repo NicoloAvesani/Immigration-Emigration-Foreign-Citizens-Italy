@@ -8,8 +8,8 @@ import statsmodels as sm
 import sklearn
 from sklearn.metrics import r2_score
 
-st.title('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
-
+st.title('Italian Foreign Emigrants 1995-2013')
+st.header('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
 
 st.title('Emigration Dataset')
 
