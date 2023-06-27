@@ -127,13 +127,14 @@ fig.update_layout(
 st.plotly_chart(fig)
 
 # let's see the main country
+st.title('Top 10 Destination Countries of Italian Foreign Emigrants ')
+
+st.write('Select the desired year to analyze')
 def get_year_input():
-    year = st.sidebar.slider('Select a year', min_value=1995, max_value=2013)
+    year = st.slider('Select a year', min_value=1995, max_value=2013)
     return year
 
 year = get_year_input()
-st.title('Top 10 Destination Countries of Italian Foreign Emigrants in '+ str(year))
-
 
 import plotly.graph_objects as go
 
@@ -145,7 +146,7 @@ fig_1 = px.bar(df_sorted_year, x='Country', y=year,
                template='plotly_white')
 
 fig_1.update_layout(
-    title='Top 10 Destination Countries of Italian Foreign Emigrants',
+    title='Top 10 Destination Countries of Italian Foreign Emigrants in '+str(year),
     xaxis_title='Countries',
     yaxis_title='Emigrants',
 )
@@ -189,7 +190,27 @@ fig_2.update_layout(
 
 st.plotly_chart(fig_2)
 
+year_chosen_top_5 = top_10_year_input.sort_values(year).tail(5)
 
+pie_df_2 = year_chosen_top_5[['Country', year]].copy()
+pie_df_2.reset_index(inplace=True, drop=True)
+
+# Set up the colors and explode list
+colors_list = ['green', 'red', 'yellow', 'blue', 'orange']
+explode_list = [0.1, 0.1, 0, 0.1, 0.1]
+
+# Create the interactive pie chart using Plotly
+fig_12 = px.pie(pie_df_2, values=year, names='Country', color_discrete_sequence=colors_list,
+             title='Italian Foreign Emigrants going back to Birth-Country in '+str(year),
+             hover_data={'Country': ':.1f%'})
+
+# Add percentage labels
+fig_12.update_traces(textposition='inside', textinfo='percent+label')
+
+# Update the layout
+fig_12.update_traces(hoverinfo='label', marker=dict(line=dict(color='#000000', width=2)))
+
+st.plotly_chart(fig_12)
 #pie chart 
 
 st.title('Italian Foreign Emigrates by Continent 1995-2013')
@@ -271,6 +292,39 @@ video_path = '/Users/ave/Desktop/social_research/total_emigrandt_italy_with_sum-
 
 # Display the video
 st.video(video_path)
+
+
+# the particular part
+st.title('Country Analysis')
+st.write('Select the desired Country in the Selectbox')
+
+def country_input():
+    region_options = list(df_sorted_emi['Country'])
+    country_input = st.selectbox('Select a Country for the Analysis', region_options)
+    return country_input
+
+country_input = country_input()
+country_mask = df_sorted_emi['Country'] == country_input
+country_df = df_sorted_emi[country_mask]
+
+country_df = country_df.drop(columns =['Type','Coverage','Country','AreaName','RegName','DevName','Total'])
+
+st.dataframe(country_df)
+
+df_plot_country = country_df.T
+df_plot_country = df_plot_country.rename_axis('Year', axis='index')
+df_plot_country = df_plot_country.rename_axis(country_input, axis='columns')
+
+y = df_plot_country.columns
+fig_country = px.line(df_plot_country, x=df_plot_country.index, y=y, title='Time Series Growth of Italian Foreign Emigrants going back to '+country_input)
+st.plotly_chart(fig_country)
+
+#bar plotly chart
+fig_country_bar = px.bar(df_plot_country, x=df_plot_country.index, y=y, title='Bar Chart of Italian Foreign Emigrants going back to ' + country_input)
+
+# Display the plot using Streamlit
+st.plotly_chart(fig_country_bar)
+
 
 # models
 years_int = list(range(1996, 2001)) + list(range(2002, 2014))
@@ -355,7 +409,7 @@ st.title('Linear and Polynomial Regression for Predicting the Emigrants')
 #polynomial
 def get_degree_input():
     degree_options = [1,2,3,4,5,6,7,8,9,10]
-    degree = st.sidebar.selectbox('Select a degree', degree_options)
+    degree = st.selectbox('Select a degree', degree_options)
     return degree
 
 degree = get_degree_input()
