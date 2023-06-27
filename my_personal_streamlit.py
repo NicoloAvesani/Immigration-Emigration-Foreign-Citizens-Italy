@@ -89,7 +89,7 @@ def get_region_input():
     return region
 
 region = get_region_input()
-st.title('Italian Foreign Emigrates to '+ region +' between 1995 and 2013')
+st.title('Italian Foreign Emigrants to '+ region +' between 1995 and 2013')
 
 
 df_area_mask = df_sorted_emi['AreaName'] == region
@@ -204,6 +204,7 @@ fig_12 = px.pie(pie_df_2, values=year, names='Country', color_discrete_sequence=
              title='Italian Foreign Emigrants going back to Birth-Country in '+str(year),
              hover_data={'Country': ':.1f%'})
 
+
 # Add percentage labels
 fig_12.update_traces(textposition='inside', textinfo='percent+label')
 
@@ -213,7 +214,7 @@ fig_12.update_traces(hoverinfo='label', marker=dict(line=dict(color='#000000', w
 st.plotly_chart(fig_12)
 #pie chart 
 
-st.title('Italian Foreign Emigrates by Continent 1995-2013')
+st.title('Italian Foreign Emigrants by Continent 1995-2013')
 continents = italy_emi_data.groupby('AreaName', axis=0).sum()
 print(type(italy_emi_data.groupby('AreaName', axis=0)))
 continents_t = continents.T.drop(columns=['World'])
@@ -249,7 +250,7 @@ def get_region_2_input():
 
 region_2 = get_region_2_input()
 
-st.title('Italian Foreign Emigrates by '+region_2+' 1995-2013')
+st.title('Italian Foreign Emigrants by '+region_2+' 1995-2013')
 
 region_chosen = italy_emi_data['AreaName'] == str(region_2)
 region_chosen_df = italy_emi_data[region_chosen]
@@ -334,7 +335,7 @@ tot.reset_index(inplace = True)
 tot.columns = ['year', 'total']
 
 #figure 5 
-st.title('Total Italian Foreign Emigrates 1995-2013')
+st.title('Total Italian Foreign Emigrants 1995-2013')
 
 fig_5, ax = plt.subplots(figsize=(6, 6))
 ax.plot(tot['year'], tot['total'], label='Total Emigration')
@@ -366,7 +367,7 @@ fig_6 = plt.figure(figsize=(10, 6))
 plt.scatter(tot['year'], tot['total'])
 plt.title('Total Emigration 1995-2013')
 plt.xlabel('Year')
-plt.ylabel('Number of Immigrants')
+plt.ylabel('Number of Emigrants')
 
 
 # Assuming you have defined 'x' and 'fit' appropriately

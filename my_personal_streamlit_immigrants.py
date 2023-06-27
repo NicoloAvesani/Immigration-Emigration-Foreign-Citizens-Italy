@@ -4,11 +4,11 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import seaborn as sb
 import numpy as np
-import statsmodels.api as sm
+import statsmodels as sm
 import sklearn
 from sklearn.metrics import mean_squared_error, r2_score
 
-st.title('Italian Foreign Emigrates 1995-2013')
+st.title('Italian Foreign Immigrates 1995-2013')
 st.header('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
 
 
@@ -56,6 +56,41 @@ for i in df_sorted_emi.index:
 
 st.dataframe(df_sorted_emi)
 
+try_df = df_sorted_emi.copy()
+
+#global
+country_list_global = list(try_df['Country'])
+total_list_global = list(try_df['Total'])
+
+# plot the global countries per immigration
+data_3 = {
+    'Country': country_list_global,
+    'Value': total_list_global
+}
+
+df_3= pd.DataFrame(data_3)
+
+# world
+st.title('World Birth-Countries of Italian Foreign Immigrants')
+fig_3 = px.choropleth(
+    df_3,
+    locations='Country',
+    locationmode='country names',
+    color='Value',
+    color_continuous_scale='Viridis',
+    range_color=(0, df_3['Value'].max()),
+    labels={'Value': 'Value'}
+)
+
+fig_3.update_geos(showcountries = True)
+fig_3.update_layout(
+    geo=dict(showframe=True, showcoastlines=False),
+    margin={"r": 0, "t": 30, "l": 0, "b": 0}
+)
+
+st.plotly_chart(fig_3)
+
+
 
 def get_region_input():
     region_options = ['Asia', 'Europe', 'North America', 'South America', 'Africa']
@@ -99,48 +134,15 @@ fig.update_layout(
 st.plotly_chart(fig)
 st.write('You can **change** the Region selecting the desired one in the Sidebox')
 
-try_df = df_sorted_emi.copy()
-#global
-country_list_global = list(try_df['Country'])
-total_list_global = list(try_df['Total'])
-
-# plot the global countries per immigration
-data_3 = {
-    'Country': country_list_global,
-    'Value': total_list_global
-}
-
-df_3= pd.DataFrame(data_3)
-
-# world
-st.title('World Birth-Countries of Italian Foreign Immigrants')
-fig_3 = px.choropleth(
-    df_3,
-    locations='Country',
-    locationmode='country names',
-    scope="world",
-    color='Value',
-    color_continuous_scale='Viridis',
-    range_color=(0, df_3['Value'].max()),
-    labels={'Value': 'Value'}
-)
-
-
-fig_3.update_layout(
-    geo=dict(showframe=True, showcoastlines=False),
-    margin={"r": 0, "t": 30, "l": 0, "b": 0}
-)
-
-st.plotly_chart(fig_3)
-
-
+st.title('Top 10 Birth-Countries of Italian Foreign Immigrants')
+st.write('Select the desired year to analyze')
 # let's see the main country
 def get_year_input():
-    year = st.sidebar.slider('Select a year', min_value=1995, max_value=2013)
+    year = st.slider('Select a year', min_value=1995, max_value=2013)
     return year
 
 year = get_year_input()
-st.title('Top 10 Birth-Countries of Italian Foreign Immigrants in '+ str(year))
+
 
 
 import plotly.graph_objects as go
@@ -176,7 +178,7 @@ data_2 = {
 
 df_2 = pd.DataFrame(data_2)
 
-st.title('Top 10 Birth-Countries of Italian Foreign Immigrants in '+ str(year))
+
 
 fig_2 = px.choropleth(
     df_2,
@@ -186,14 +188,38 @@ fig_2 = px.choropleth(
     color='Value',
     color_continuous_scale='Viridis',
     range_color=(0, df_2['Value'].max()),
-    labels={'Value': 'Value'}
+    labels={'Value': 'Value'},
+    title= 'Top 10 Birth-Countries of Italian Foreign Immigrants in '+ str(year)
 )
+
+fig_2.update_geos(showcountries = True)
 fig_2.update_layout(
     geo=dict(showframe=False, showcoastlines=False),
     margin={"r": 0, "t": 30, "l": 0, "b": 0}
 )
 
 st.plotly_chart(fig_2)
+
+year_chosen_top_5 = top_10_year_input.sort_values(year).tail(5)
+
+pie_df_2 = year_chosen_top_5[['Country', year]].copy()
+pie_df_2.reset_index(inplace=True, drop=True)
+
+# Set up the colors and explode list
+colors_list = ['green', 'red', 'yellow', 'blue', 'orange']
+explode_list = [0.1, 0.1, 0, 0.1, 0.1]
+
+# Create the interactive pie chart using Plotly
+fig_12 = px.pie(pie_df_2, values=year, names='Country', color_discrete_sequence=colors_list,
+             title='Top 5 Birth-Countries of Italian Foreign Immigrants in '+str(year),
+             hover_data={'Country': ':.1f%'})
+# Add percentage labels
+fig_12.update_traces(textposition='inside', textinfo='percent+label')
+
+# Update the layout
+fig_12.update_traces(hoverinfo='label', marker=dict(line=dict(color='#000000', width=2)))
+
+st.plotly_chart(fig_12)
 
 #pie chart 
 
@@ -277,6 +303,37 @@ video_path = '/Users/ave/Desktop/social_research/Total arrived in Italy sum.mp4'
 # Display the video
 st.video(video_path)
 
+# the particular part
+st.title('Country Analysis')
+st.write('Select the desired Country in the Selectbox')
+
+def country_input():
+    region_options = list(df_sorted_emi['Country'])
+    country_input = st.selectbox('Select a Country for the Analysis', region_options)
+    return country_input
+
+country_input = country_input()
+country_mask = df_sorted_emi['Country'] == country_input
+country_df = df_sorted_emi[country_mask]
+
+country_df = country_df.drop(columns =['Type','Coverage','Country','AreaName','RegName','DevName','Total'])
+
+st.dataframe(country_df)
+
+df_plot_country = country_df.T
+df_plot_country = df_plot_country.rename_axis('Year', axis='index')
+df_plot_country = df_plot_country.rename_axis(country_input, axis='columns')
+
+y = df_plot_country.columns
+fig_country = px.line(df_plot_country, x=df_plot_country.index, y=y, title='Time Series Growth of Italian Foreign Immigrants from '+country_input)
+st.plotly_chart(fig_country)
+
+#bar plotly chart
+fig_country_bar = px.bar(df_plot_country, x=df_plot_country.index, y=y, title='Bar Chart of Italian Foreign Immigrants from ' + country_input)
+
+# Display the plot using Streamlit
+st.plotly_chart(fig_country_bar)
+
 # models
 years_int = list(range(1996, 2001)) + list(range(2002, 2014))
 tot = pd.DataFrame(italy_imm_data[years_int].sum(axis=0))
@@ -308,7 +365,8 @@ ax.legend()
 
 st.pyplot(fig_5)
 
-# regression
+
+# linear regression
 x = tot['year']
 y = tot['total']
 fit = np.polyfit(x, y, deg=1)
@@ -326,7 +384,7 @@ plt.plot(x, fit[0] * x + fit[1], color='red')
 st.pyplot(fig_6)
 
 
-st.title('Polynomial Regression, Predicting the Immigrants')
+st.title('Linear Regression for Predicting the Immigrants')
 # polynomial regression
 fit = np.polyfit(x, y, deg=1)
 
@@ -348,15 +406,19 @@ plt.scatter(x_pred, y_pred, color='green', label='Predicted Data')
 
 plt.title('Prediction of Number of Immigrants')
 plt.xlabel('Year')
-plt.ylabel('Total Immigrants')
+plt.ylabel('Total Emigrants')
 plt.legend()
 
 st.pyplot(fig_7)
+r2 = r2_score(y, fit[0] * x + fit[1])
+st.write("R-squared Score:", r2)
 
 
+st.title('Linear and Polynomial Regression for Predicting the Immigrants')
+#polynomial
 def get_degree_input():
     degree_options = [1,2,3,4,5,6,7,8,9,10]
-    degree = st.sidebar.selectbox('Select a degree', degree_options)
+    degree = st.selectbox('Select a degree', degree_options)
     return degree
 
 degree = get_degree_input()
@@ -373,7 +435,7 @@ x_pred = np.arange(min(x), max(x) + 5)  # Extend by 5 years
 # Predict the corresponding y values using the polynomial regression
 y_pred = poly(x_pred)
 
-fig_8 = plt.figure(figsize=(6, 6))
+fig_8 = plt.figure(figsize=(6,6))
 # Plot the original data points
 plt.scatter(x, y, color='blue', label='Original Data')
 
@@ -385,13 +447,53 @@ plt.scatter(x_pred[-11:], y_pred[-11:], color='green', label='Predicted Data')
 
 plt.title('Prediction of Number of Immigrants')
 plt.xlabel('Year')
-plt.ylabel('Total Immigrants')
+plt.ylabel('Total Emigrants')
 plt.legend()
-
-
-# Calculate R-squared score for the polynomial regression
-y_pred_train = poly(x)
+plt.show()
 
 st.pyplot(fig_8)
-r2_2 = r2_score(y, fit[0] * x + fit[1])
-st.write("R-squared Score:", r2_2)
+
+#r2
+y_pred_train = poly(x)
+r2 = r2_score(y, y_pred_train)
+st.write("R-squared Score:", r2)
+
+
+st.title('Using ARIMA to Predict the Total Immigrants in next 3 years')
+# last model, use the stats model ARIMA
+import statsmodels.api as sm
+
+df_prediction = tot.copy()
+# Prepare the data for time series forecasting
+df_prediction['year'] = pd.to_datetime(df_prediction['year'], format='%Y')
+df_prediction.set_index('year', inplace=True)
+
+# Create and fit the ARIMA model
+model = sm.tsa.ARIMA(df_prediction['total'], order=(1, 1, 1))
+model_fit = model.fit()
+
+# Predict immigration for the next three years
+next_years = pd.date_range(start='2014', periods=3, freq='A')
+predicted_immigration = model_fit.predict(start=df_prediction.shape[0], end=df_prediction.shape[0]+2)
+
+# Plotting the historical data
+fig_11 = plt.figure(figsize=(6,6))
+years = tot['year'].values
+immigration = tot['total'].values
+
+plt.plot(years, immigration, marker='o', linestyle='-', label='Historical Data')
+
+# Plotting the predicted values
+next_years = np.arange(2014, 2017)
+predicted_immigration = predicted_immigration
+
+plt.plot(next_years, predicted_immigration, marker='o', linestyle='-', label='Predicted Data')
+
+# Adding labels and title to the plot
+plt.xlabel('Year')
+plt.ylabel('Emigration')
+plt.title('Historical and Predicted Emigration')
+plt.legend()
+
+# Display the plot
+st.pyplot(fig_11)
