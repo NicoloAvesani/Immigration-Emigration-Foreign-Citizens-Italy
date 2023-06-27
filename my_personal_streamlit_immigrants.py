@@ -334,6 +334,41 @@ fig_country_bar = px.bar(df_plot_country, x=df_plot_country.index, y=y, title='B
 # Display the plot using Streamlit
 st.plotly_chart(fig_country_bar)
 
+#bar chart growth
+growth_input_country = []
+
+year_columns_input_country = list(country_df.columns)
+
+for i in range(len(year_columns_input_country)):
+    if i == 0:
+        continue
+    else:
+
+        growth_input_country.append(((country_df[year_columns_input_country[i]] - country_df[year_columns_input_country[i-1]])/country_df[year_columns_input_country[i-1]])*100)
+values = [item.values[0] for item in growth_input_country]
+years_to_input = [str(year) for year in range(1996, 2014) if year != 2001]
+
+fig_13 = plt.figure(figsize=(13,8))
+plt.title('Percentual growth over years of Italian Foreign Immigrants from ' + country_input)
+data = values
+colors = ['red' if x < 0 else 'blue' for x in data]
+indices = np.arange(len(data))
+
+plt.bar(indices, data, color=colors)
+
+# Add variation percentages below each bar for negative values
+for i, value in enumerate(data):
+    if np.isnan(value):
+        continue
+    if value < 0:
+        plt.text(i, value, f'{value:.2f}%', ha='center', va='top')
+    else:
+        plt.text(i, value, f'{value:.2f}%', ha='center', va='bottom')
+plt.xticks(indices, years_to_input)
+plt.xlabel('Year')
+plt.ylabel('Percentual growth')
+st.pyplot(fig_13)
+
 # models
 years_int = list(range(1996, 2001)) + list(range(2002, 2014))
 tot = pd.DataFrame(italy_imm_data[years_int].sum(axis=0))
