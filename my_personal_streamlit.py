@@ -63,7 +63,7 @@ data_3 = {
 
 df_3= pd.DataFrame(data_3)
 
-st.title('World destination of Foreign Emigrants in Italy')
+st.title('World Birth-Countries of Foreign Emigrants in Italy')
 fig_3 = px.choropleth(
     df_3,
     locations='Country',
@@ -89,7 +89,7 @@ def get_region_input():
     return region
 
 region = get_region_input()
-st.title('Foreign Emigrants in Italy to '+ region +' between 1995 and 2013')
+st.title('Foreign Emigrants in Italy from '+ region +' between 1995 and 2013')
 
 
 df_area_mask = df_sorted_emi['AreaName'] == region
@@ -127,7 +127,7 @@ fig.update_layout(
 st.plotly_chart(fig)
 
 # let's see the main country
-st.title('Top 10 Destination Countries of Foreign Emigrants in Italy ')
+st.title('Top 10 Birth-Countries of Foreign Emigrants in Italy ')
 
 st.write('Select the desired year to analyze')
 def get_year_input():
@@ -146,7 +146,7 @@ fig_1 = px.bar(df_sorted_year, x='Country', y=year,
                template='plotly_white')
 
 fig_1.update_layout(
-    title='Top 10 Destination Countries of Foreign Emigrants in Italy in '+str(year),
+    title='Top 10 Birth-Countries of Foreign Emigrants in Italy in '+str(year),
     xaxis_title='Countries',
     yaxis_title='Emigrants',
 )
@@ -168,7 +168,7 @@ data_2 = {
 
 df_2 = pd.DataFrame(data_2)
 
-st.title('Top 10 destionation Countries of Foreign Emigrants in Italy in '+ str(year))
+st.title('Top 10 Birth-Countries of Foreign Emigrants in Italy in '+ str(year))
 
 fig_2 = px.choropleth(
     df_2,
@@ -201,7 +201,7 @@ explode_list = [0.1, 0.1, 0, 0.1, 0.1]
 
 # Create the interactive pie chart using Plotly
 fig_12 = px.pie(pie_df_2, values=year, names='Country', color_discrete_sequence=colors_list,
-             title='Foreign Emigrants in ItalyBirth-Country in '+str(year),
+             title='Birth-Country of Foreign Emigrants in Italy in '+str(year),
              hover_data={'Country': ':.1f%'})
 
 
@@ -250,7 +250,7 @@ def get_region_2_input():
 
 region_2 = get_region_2_input()
 
-st.title('Foreign Emigrants in Italy by '+region_2+' 1995-2013')
+st.title('Foreign Emigrants in Italy from '+region_2+' 1995-2013')
 
 region_chosen = italy_emi_data['AreaName'] == str(region_2)
 region_chosen_df = italy_emi_data[region_chosen]
@@ -387,7 +387,7 @@ trend_line = np.polyval(coefficients, years)
 ax.plot(years, trend_line, color='red', label='Trend Line')
 ax.set_title('Total Foreign Emigrants in Italy from 1995 to 2013')
 ax.set_xlabel('Year')
-ax.set_ylabel('Number of Immigrants')
+ax.set_ylabel('Number of Emigrants')
 ax.legend()
 
 st.pyplot(fig_5)
