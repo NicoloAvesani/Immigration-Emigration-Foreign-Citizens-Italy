@@ -8,7 +8,7 @@ import statsmodels as sm
 import sklearn
 from sklearn.metrics import r2_score
 
-st.title('Italian Foreign Emigrants 1995-2013')
+st.title('Foreign Emigrants in Italy 1995-2013')
 st.header('NICOLO AVESANI VR490189 SOCIAL RESEARCH FINAL PROJECT 2022-2023')
 
 st.title('Emigration Dataset')
@@ -63,7 +63,7 @@ data_3 = {
 
 df_3= pd.DataFrame(data_3)
 
-st.title('World destination of Italian Foreign Emigrants')
+st.title('World destination of Foreign Emigrants in Italy')
 fig_3 = px.choropleth(
     df_3,
     locations='Country',
@@ -89,7 +89,7 @@ def get_region_input():
     return region
 
 region = get_region_input()
-st.title('Italian Foreign Emigrants to '+ region +' between 1995 and 2013')
+st.title('Foreign Emigrants in Italy to '+ region +' between 1995 and 2013')
 
 
 df_area_mask = df_sorted_emi['AreaName'] == region
@@ -127,7 +127,7 @@ fig.update_layout(
 st.plotly_chart(fig)
 
 # let's see the main country
-st.title('Top 10 Destination Countries of Italian Foreign Emigrants ')
+st.title('Top 10 Destination Countries of Foreign Emigrants in Italy ')
 
 st.write('Select the desired year to analyze')
 def get_year_input():
@@ -146,7 +146,7 @@ fig_1 = px.bar(df_sorted_year, x='Country', y=year,
                template='plotly_white')
 
 fig_1.update_layout(
-    title='Top 10 Destination Countries of Italian Foreign Emigrants in '+str(year),
+    title='Top 10 Destination Countries of Foreign Emigrants in Italy in '+str(year),
     xaxis_title='Countries',
     yaxis_title='Emigrants',
 )
@@ -168,7 +168,7 @@ data_2 = {
 
 df_2 = pd.DataFrame(data_2)
 
-st.title('Top 10 destionation Countries of Italian Foreign Emigrants in '+ str(year))
+st.title('Top 10 destionation Countries of Foreign Emigrants in Italy in '+ str(year))
 
 fig_2 = px.choropleth(
     df_2,
@@ -201,7 +201,7 @@ explode_list = [0.1, 0.1, 0, 0.1, 0.1]
 
 # Create the interactive pie chart using Plotly
 fig_12 = px.pie(pie_df_2, values=year, names='Country', color_discrete_sequence=colors_list,
-             title='Italian Foreign Emigrants going back to Birth-Country in '+str(year),
+             title='Foreign Emigrants in ItalyBirth-Country in '+str(year),
              hover_data={'Country': ':.1f%'})
 
 
@@ -214,7 +214,7 @@ fig_12.update_traces(hoverinfo='label', marker=dict(line=dict(color='#000000', w
 st.plotly_chart(fig_12)
 #pie chart 
 
-st.title('Italian Foreign Emigrants by Continent 1995-2013')
+st.title('Foreign Emigrants in Italy by Continent 1995-2013')
 continents = italy_emi_data.groupby('AreaName', axis=0).sum()
 print(type(italy_emi_data.groupby('AreaName', axis=0)))
 continents_t = continents.T.drop(columns=['World'])
@@ -250,7 +250,7 @@ def get_region_2_input():
 
 region_2 = get_region_2_input()
 
-st.title('Italian Foreign Emigrants by '+region_2+' 1995-2013')
+st.title('Foreign Emigrants in Italy by '+region_2+' 1995-2013')
 
 region_chosen = italy_emi_data['AreaName'] == str(region_2)
 region_chosen_df = italy_emi_data[region_chosen]
@@ -266,7 +266,7 @@ explode_list = [0.1, 0.1, 0, 0.1, 0.1]
 
 # Create the interactive pie chart using Plotly
 fig_10 = px.pie(pie_df_2, values='Total', names='Country', color_discrete_sequence=colors_list,
-             title='Italian Foreign Emigrants going back to '+ region_2+' Countries [1995 - 2013]',
+             title='Foreign Emigrants in Italy'+ region_2+' Countries [1995 - 2013]',
              hover_data={'Total': ':.1f%'})
 
 # Add percentage labels
@@ -278,7 +278,7 @@ fig_10.update_traces(hoverinfo='label', marker=dict(line=dict(color='#000000', w
 st.plotly_chart(fig_10)
 
 
-st.title("Italian Foreign Emigrants per Year")
+st.title("Foreign Emigrants in Italy per Year")
 
 # Specify the video file path
 video_path = '/Users/ave/Desktop/social_research/Number of Foreigner Emigrants from Italy per Year.mp4'
@@ -286,7 +286,7 @@ video_path = '/Users/ave/Desktop/social_research/Number of Foreigner Emigrants f
 # Display the video
 st.video(video_path)
 
-st.title("Total Italian Foreign Emigrants 1995-2013")
+st.title("Total Foreign Emigrants in Italy 1995-2013")
 
 # Specify the video file path
 video_path = '/Users/ave/Desktop/social_research/total_emigrandt_italy_with_sum-2.mp4'
@@ -317,11 +317,11 @@ df_plot_country = df_plot_country.rename_axis('Year', axis='index')
 df_plot_country = df_plot_country.rename_axis(country_input, axis='columns')
 
 y = df_plot_country.columns
-fig_country = px.line(df_plot_country, x=df_plot_country.index, y=y, title='Time Series Growth of Italian Foreign Emigrants going back to '+country_input)
+fig_country = px.line(df_plot_country, x=df_plot_country.index, y=y, title='Time Series Growth of Foreign Emigrants in Italy'+country_input)
 st.plotly_chart(fig_country)
 
 #bar plotly chart
-fig_country_bar = px.bar(df_plot_country, x=df_plot_country.index, y=y, title='Bar Chart of Italian Foreign Emigrants going back to ' + country_input)
+fig_country_bar = px.bar(df_plot_country, x=df_plot_country.index, y=y, title='Bar Chart of Foreign Emigrants in Italy' + country_input)
 
 # Display the plot using Streamlit
 st.plotly_chart(fig_country_bar)
@@ -341,7 +341,7 @@ values = [item.values[0] for item in growth_input_country]
 years_to_input = [str(year) for year in range(1996, 2014) if year != 2001]
 
 fig_13 = plt.figure(figsize=(13,8))
-plt.title('Percentual growth over years of Italian Foreign Emigrants going back to ' + country_input)
+plt.title('Percentual growth over years of Foreign Emigrants in Italy' + country_input)
 data = values
 colors = ['red' if x < 0 else 'blue' for x in data]
 indices = np.arange(len(data))
@@ -369,7 +369,7 @@ tot.reset_index(inplace = True)
 tot.columns = ['year', 'total']
 
 #figure 5 
-st.title('Total Italian Foreign Emigrants 1995-2013')
+st.title('Total Foreign Emigrants in Italy 1995-2013')
 
 fig_5, ax = plt.subplots(figsize=(6, 6))
 ax.plot(tot['year'], tot['total'], label='Total Emigration')
@@ -385,7 +385,7 @@ coefficients = np.polyfit(years, total, 1)  # Use 1 for a linear trend line
 trend_line = np.polyval(coefficients, years)
 
 ax.plot(years, trend_line, color='red', label='Trend Line')
-ax.set_title('Total Italian Foreign Emigrants from 1995 to 2013')
+ax.set_title('Total Foreign Emigrants in Italy from 1995 to 2013')
 ax.set_xlabel('Year')
 ax.set_ylabel('Number of Immigrants')
 ax.legend()
