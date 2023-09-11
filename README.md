@@ -1,6 +1,6 @@
 # Social-research project
 In this project I analyze the Immigration and Emigration of Foreign Citizens to and from Italy in the period 1995-2013.
-I used a lot the Plotly library for creating interesting plots (pies, bar and maps)
+I used a lot the Plotly library for creating interesting plots (pies, bars and maps)
 
 The dataset 'italy.xlsx' is an Excel file, the source is the UN website.
 
