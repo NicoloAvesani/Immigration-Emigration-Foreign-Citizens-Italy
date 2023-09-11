@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-import plotly.express as px
+import plotly as px
 import matplotlib.pyplot as plt
 import seaborn as sb
 import numpy as np
